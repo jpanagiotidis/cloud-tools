@@ -20,6 +20,11 @@ class DateObj {
   }
 }
 
+function getTimestamp(value){
+  return (new DateObj(value))getTimestamp();
+}
+
 module.exports = {
   DateObj,
+  getTimestamp,
 };
