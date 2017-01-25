@@ -37,6 +37,7 @@ class SQSConsumer extends SQSEntity{
       "WaitTimeSeconds": 20,
     }).promise()
     .then((res) => {
+      debug(debugName, 'fetchMessages:', res);
       messages = res.Messages ? res.Messages : [];
       return Promise.resolve(messages);
     })
