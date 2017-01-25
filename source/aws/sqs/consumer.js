@@ -61,7 +61,7 @@ class SQSConsumer extends SQSEntity{
         QueueUrl: this.queueURL,
       }).promise()
       .then((res) => {
-        debug(debugName, `batchDelete result: ${res}`);
+        debug(debugName, 'batchDelete result:', res);
         return Promise.resolve();
       });
     }
