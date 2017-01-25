@@ -2,7 +2,10 @@
 
 const aws = require('aws-sdk');
 const _ = require('lodash');
+const debug = require('../../debug');
 const SQSEntity = require('./entity.js').SQSEntity;
+
+const debugName = 'SQSConsumer';
 
 class SQSConsumer extends SQSEntity{
   constructor(queueURL, data, handler, errorHandler) {
@@ -39,6 +42,7 @@ class SQSConsumer extends SQSEntity{
     })
     .then(this.handler)
     .then((res) => {
+      debug(debugName, `Message Handler returned: ${res}`)
       return Promise.resolve(res && _.isArray(res) ? res : messages);
     })
     .then(this.batchDelete.bind(this))
@@ -55,7 +59,11 @@ class SQSConsumer extends SQSEntity{
       return this.sqs.deleteMessageBatch({
         Entries: messages,
         QueueUrl: this.queueURL,
-      }).promise();
+      }).promise()
+      .then((res) => {
+        debug(debugName, `batchDelete result: ${res}`);
+        return Promise.resolve();
+      });
     }
   }
 }
