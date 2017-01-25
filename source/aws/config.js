@@ -16,6 +16,9 @@ const services = {
   SQS: {
     apiVersion: '2012-11-05',
   },
+  CloudWatchLogs: {
+    apiVersion: '2014-03-28',
+  },
 };
 
 aws.config.update(configGlobal);

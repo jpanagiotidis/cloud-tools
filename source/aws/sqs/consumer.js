@@ -1,6 +1,5 @@
 'use strict';
 
-const config = require('../config.js').services;
 const aws = require('aws-sdk');
 const _ = require('lodash');
 const SQSEntity = require('./entity.js').SQSEntity;
