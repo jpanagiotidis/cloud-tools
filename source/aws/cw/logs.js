@@ -91,13 +91,9 @@ class CWLogs {
     }
     const batches = prepareLogsBatches(data);
     debug(debugName, 'putLogs: Start sending data');
-    console.log('\n\nLLLL', batches, '\n\n');
-    console.log(batches.length);
     for (var i = 0; i < batches.length; i++) {
-      console.log('MMM', batches[i]);
     }
     return chain(batches.map((b, i) => {
-      console.log('\n\nB', b, i, b.length, '\n\n');
       return {
         arguments: [b],
         promise: this.putBatch.bind(this),

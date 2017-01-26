@@ -14,7 +14,6 @@ function prepareLogsBatches(logs) {
   let sLogs = sortLogs(logs);
   let batch = [];
   out.push(batch);
-  console.log(sLogs[0]);
   let cTimestamp = sLogs[0].timestamp;
   let cSize = 0;
   _.each(sLogs, (l) => {
