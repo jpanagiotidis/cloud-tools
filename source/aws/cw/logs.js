@@ -1,7 +1,10 @@
 'use strict';
 
 const config = require('../config.js').services.CloudWatchLogs;
+const debug = require('../../debug');
 const aws = require('aws-sdk');
+
+const debugName = 'CWLogs';
 
 class CWLogs {
   constructor(groupName, streamName, data) {
@@ -22,8 +25,10 @@ class CWLogs {
     return this.checkGroupExists(this.groupName)
     .then((res) => {
       if(res === false){
+        debug(debugName, 'Creating Group:', this.groupName);
         return this.createGroup(this.groupName);
       }
+      debug(debugName, 'Group exists:', this.groupName);
       return Promise.resolve();
     })
     .then((res) => {
@@ -31,8 +36,10 @@ class CWLogs {
     })
     .then((res) => {
       if(res === false){
+        debug(debugName, 'Creating Stream:', this.streamName);
         return this.createStream(this.groupName, this.streamName);
       }
+      debug(debugName, 'Stream exists:', this.streamName);
       return Promise.resolve();
     });
   }
@@ -77,6 +84,7 @@ class CWLogs {
 
   putLogs(data) {
     if(data.length === 0){
+      debug(debugName, 'putLogs: No data to send!');
       return Promise.resolve();;
     }
 
@@ -89,6 +97,8 @@ class CWLogs {
         return 0;
       }
     });
+
+    debug(debugName, 'putLogs: Start sending data');
     return this.cw.putLogEvents({
       logEvents: data,
       logGroupName: this.groupName,
@@ -96,6 +106,7 @@ class CWLogs {
       sequenceToken: this.sequenceToken,
     }).promise()
     .then((res) => {
+      debug(debugName, 'putLogs: Sending data completed');
       this.sequenceToken = res.nextSequenceToken;
       return Promise.resolve();
     });
