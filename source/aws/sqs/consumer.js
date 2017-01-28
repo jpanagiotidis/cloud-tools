@@ -1,40 +1,39 @@
 'use strict';
 
-const aws = require('aws-sdk');
 const _ = require('lodash');
 const debug = require('../../debug');
 const SQSEntity = require('./entity.js').SQSEntity;
 
 const debugName = 'SQSConsumer';
 
-class SQSConsumer extends SQSEntity{
+class SQSConsumer extends SQSEntity {
   constructor(queueURL, data, handler, errorHandler) {
     super(queueURL, data);
     this.handler = handler;
     this.errorHandler = errorHandler;
   }
 
-  start(){
+  start() {
     this.isPolling = true;
     this.step();
   }
 
-  stop(){
+  stop() {
     this.isPolling = false;
   }
 
-  step(){
-    if(this.isPolling){
+  step() {
+    if (this.isPolling) {
       this.fetchMessages();
     }
   }
 
-  fetchMessages(){
+  fetchMessages() {
     let messages;
     this.sqs.receiveMessage({
-      "QueueUrl": this.queueURL,
-      "MaxNumberOfMessages": 10,
-      "WaitTimeSeconds": 20,
+      QueueUrl: this.queueURL,
+      MaxNumberOfMessages: 10,
+      WaitTimeSeconds: 20,
     }).promise()
     .then((res) => {
       debug(debugName, 'fetchMessages:', res);
@@ -43,7 +42,7 @@ class SQSConsumer extends SQSEntity{
     })
     .then(this.handler)
     .then((res) => {
-      debug(debugName, `Message Handler returned: ${res}`)
+      debug(debugName, `Message Handler returned: ${res}`);
       return Promise.resolve(res && _.isArray(res) ? res : messages);
     })
     .then(this.batchDelete.bind(this))
@@ -51,14 +50,14 @@ class SQSConsumer extends SQSEntity{
     .catch(this.errorHandler);
   }
 
-  batchDelete(messages){
-    if(_.isArray(messages) && messages.length > 0){
-      messages = messages.map((m) => ({
-        'Id': m.MessageId,
-        'ReceiptHandle': m.ReceiptHandle,
+  batchDelete(messages) {
+    if (_.isArray(messages) && messages.length > 0) {
+      const processed = messages.map(m => ({
+        Id: m.MessageId,
+        ReceiptHandle: m.ReceiptHandle,
       }));
       return this.sqs.deleteMessageBatch({
-        Entries: messages,
+        Entries: processed,
         QueueUrl: this.queueURL,
       }).promise()
       .then((res) => {
@@ -66,6 +65,9 @@ class SQSConsumer extends SQSEntity{
         return Promise.resolve();
       });
     }
+
+    debug(debugName, 'batchDelete: No messages to delete');
+    return Promise.resolve();
   }
 }
 

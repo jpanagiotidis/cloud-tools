@@ -6,18 +6,29 @@ const aws = require('aws-sdk');
 const SQSProducer = require('../../source/aws/sqs/producer.js').SQSProducer;
 
 describe('AWS SQS Tests Suite', function(){
+  it('sendMessage stub', sinon.test(function(done){
+    this.stub(aws, 'SQS', AWSStub);
 
-  it('has SQSProducer class', function(){
-    expect(SQSProducer).to.be.a('function');
-    const producer = new SQSProducer();
-    expect(producer).to.be.an.instanceof(SQSProducer);
-  });
+    const sqs = new aws.SQS();
 
-  it('fsdf', sinon.test(function(){
-
+    sqs.sendMessage()
+    .then(() => {
+      done();
+    })
+    .catch((err) => {
+      done(err);
+    })
   }));
 });
 
+function AWSStub(){
+  console.log('This is AWS Stub constructor');
+}
+
+AWSStub.prototype.sendMessage = function(msg) {
+  console.log('sendMessageStub', msg);
+  return Promise.resolve('OKOK');
+}
 
 /*
  * ON SUCCESS

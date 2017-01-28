@@ -4,7 +4,6 @@ const aws = require('aws-sdk');
 const configUtils = require('../config/utils.js');
 
 const env = configUtils.env;
-const check = configUtils.check;
 
 const configGlobal = {
   signatureVersion: 'v4',
@@ -35,4 +34,4 @@ module.exports = {
   services,
   setConfig,
   getConfig,
-}
+};
