@@ -1,6 +1,6 @@
 {
   "name": "cloud-tools",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Cloud Tools for NodeJS",
   "main": "index.js",
   "engines": {
@@ -9,6 +9,7 @@
   "scripts": {
     "test": "grunt lint && npm run cover",
     "mocha": "mocha \"test/**/*.js\"",
+    "time": "mocha \"test/utils/test.js\"",
     "cover": "istanbul cover _mocha test/**/*.js"
   },
   "author": "",

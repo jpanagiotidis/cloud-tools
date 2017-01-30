@@ -10,7 +10,7 @@ function sleep(value) {
 
 function stringBytes(s) {
   // eslint-disable-next-line no-bitwise
-  return ~-encodeURI(s).split(/%..|./).length;
+  return ~-encodeURI(s || '').split(/%..|./).length;
 }
 
 function jsonSize(s) {

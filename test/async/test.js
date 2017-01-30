@@ -6,18 +6,26 @@ const sinon = require('sinon');
 
 const errorMsg = 'Weird Error';
 const modulePath = path.join(__dirname, '../../source/async/index.js');
-sinon.config = {
-  useFakeTimers: false
-};
 
 describe('Async Module Tests', function(){
+  before(function() {
+    sinon.config = {
+      useFakeTimers: false,
+    };
+  });
+
+  after(function() {
+    sinon.config = {
+      useFakeTimers: true,
+    };
+  });
 
   it('has chain function', function(){
     const async = require(modulePath);
     expect(async.chain).to.be.a('function');
   });
 
-  it('promises are executed in chain', sinon.test(function(done){
+  it('promises are executed in sequence', sinon.test(function(done){
     const async = require(modulePath);
 
     const pSpy1 = this.spy(dummyPromise);
@@ -116,12 +124,72 @@ describe('Async Module Tests', function(){
       }
     });
   }));
+
+  it('it works for one promise', sinon.test(function(done) {
+    const async = require(modulePath);
+    const pSpy1 = this.spy(dummyPromise);
+    const args1 = ['a', 'b', 'c'];
+    const data = [
+      {
+        promise: pSpy1,
+        arguments: args1,
+      },
+    ];
+
+    async.chain(data)
+    .then((res) => {
+      expect(pSpy1).to.have.property('callCount', 1);
+      expect(pSpy1.args[0]).to.be.eql(args1);
+      expect(res[0]).to.be.equal(args1.join('-'));
+      done();
+    })
+    .catch(done);
+  }));
+
+  it('it works for zero promises', function(done) {
+    const async = require(modulePath);
+    const data = [];
+
+    async.chain(data)
+    .then((res) => {
+      expect(res).to.be.eql([]);
+      done();
+    })
+    .catch(done);
+  });
+
+  it('it works for undefined arguments', sinon.test(function(done) {
+    const async = require(modulePath);
+    const pSpy1 = this.spy(dummyPromiseB);
+    const data = [
+      {
+        promise: pSpy1,
+      },
+    ];
+
+    async.chain(data)
+    .then((res) => {
+      expect(pSpy1).to.have.property('callCount', 1);
+      expect(pSpy1.args[0]).to.be.eql([]);
+      expect(res[0]).to.be.equal('someValue');
+      done();
+    })
+    .catch(done);
+  }));
 });
 
 function dummyPromise(){
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve(Array.prototype.slice.call(arguments).join('-'));
+    }, 20);
+  });
+}
+
+function dummyPromiseB(){
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve('someValue');
     }, 20);
   });
 }
