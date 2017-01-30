@@ -29,5 +29,6 @@ class SQSProducer extends SQSEntity {
 }
 
 module.exports = {
+  ERROR_UNDEFINED_QUEUE,
   SQSProducer,
 };
