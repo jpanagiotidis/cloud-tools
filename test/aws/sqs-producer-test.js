@@ -4,8 +4,9 @@ const sinon = require('sinon');
 const expect = require('chai').expect;
 const aws = require('aws-sdk');
 const stubs = require('./stubs.js');
-const AWSStubGenerator = stubs.AWSStubGenerator;
 const sqs = require('../../source/aws/sqs/producer.js');
+
+const AWSStubGenerator = stubs.AWSStubGenerator;
 const errorMsg = sqs.ERROR_UNDEFINED_QUEUE;
 const SQSProducer = sqs.SQSProducer;
 
@@ -50,7 +51,7 @@ const dummyObject = {
 const dummyRegion = 'dummy-region';
 
 describe('SQSProducer Tests', function() {
-  it('has a SQSProducer class', function() {
+  it('has a SQSProducer constructor', function() {
     expect(SQSProducer).to.be.a('function');
     const prod = new SQSProducer();
     expect(prod).to.be.an('object');
