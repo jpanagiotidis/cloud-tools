@@ -26,18 +26,18 @@ class CWLogs {
   init() {
     return this.checkGroupExists(this.groupName)
     .then((res) => {
-      if(res === false){
+      if (res === false) {
         debug(debugName, 'Creating Group:', this.groupName);
         return this.createGroup(this.groupName);
       }
       debug(debugName, 'Group exists:', this.groupName);
       return Promise.resolve();
     })
+    .then(
+      () => (this.checkStreamExists(this.groupName, this.streamName))
+    )
     .then((res) => {
-      return this.checkStreamExists(this.groupName, this.streamName);
-    })
-    .then((res) => {
-      if(res === false){
+      if (res === false) {
         debug(debugName, 'Creating Stream:', this.streamName);
         return this.createStream(this.groupName, this.streamName);
       }
@@ -50,9 +50,9 @@ class CWLogs {
     return this.cw.describeLogGroups({
       logGroupNamePrefix: this.groupName,
     }).promise()
-    .then((res) => {
-      return Promise.resolve(res.logGroups.length > 0);
-    });
+    .then(
+      res => (Promise.resolve(res.logGroups.length > 0)
+    ));
   }
 
   createGroup() {
@@ -67,10 +67,10 @@ class CWLogs {
       logStreamNamePrefix: this.streamName,
     }).promise()
     .then((res) => {
-      const stream = res.logStreams.filter((s) => {
-        return s.logStreamName === this.streamName;
-      })[0];
-      if(stream){
+      const stream = res.logStreams.filter(
+        s => (s.logStreamName === this.streamName)
+      )[0];
+      if (stream) {
         this.sequenceToken = stream.uploadSequenceToken;
       }
       return Promise.resolve(!!stream);
@@ -85,20 +85,16 @@ class CWLogs {
   }
 
   putLogs(data) {
-    if(data.length === 0){
-      debug(debugName, 'putLogs: No data to send!');
-      return Promise.resolve();;
+    if (data.length === 0) {
+      debug(debugName, 'putLogs: No data to send!', data);
+      return Promise.resolve();
     }
     const batches = prepareLogsBatches(data);
     debug(debugName, 'putLogs: Start sending data');
-    for (var i = 0; i < batches.length; i++) {
-    }
-    return chain(batches.map((b, i) => {
-      return {
-        arguments: [b],
-        promise: this.putBatch.bind(this),
-      };
-    }))
+    return chain(batches.map(b => ({
+      arguments: [b],
+      promise: this.putBatch.bind(this),
+    })))
     .then(() => {
       debug(debugName, 'putLogs: Sending data completed');
       return Promise.resolve();
@@ -106,6 +102,10 @@ class CWLogs {
   }
 
   putBatch(data) {
+    if (data.length === 0) {
+      debug(debugName, 'putBatch: No data to send!', data);
+      return Promise.resolve();
+    }
     debug(debugName, 'putBatch: Start sending data', data);
     return this.cw.putLogEvents({
       logEvents: data,
@@ -123,4 +123,4 @@ class CWLogs {
 
 module.exports = {
   CWLogs,
-}
+};

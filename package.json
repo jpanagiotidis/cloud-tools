@@ -1,13 +1,16 @@
 {
   "name": "cloud-tools",
-  "version": "0.0.1",
+  "version": "0.0.5",
   "description": "Cloud Tools for NodeJS",
   "main": "index.js",
   "engines": {
     "node": ">=4.4.6"
   },
   "scripts": {
-    "test": "mocha \"test/**/*.js\""
+    "test": "grunt lint && npm run cover",
+    "mocha": "mocha \"test/**/*.js\"",
+    "time": "mocha \"test/utils/test.js\"",
+    "cover": "istanbul cover _mocha test/**/*.js"
   },
   "author": "",
   "license": "ISC",
@@ -20,6 +23,14 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
+    "eslint": "^3.14.1",
+    "eslint-config-airbnb": "^14.0.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^3.0.2",
+    "eslint-plugin-react": "^6.9.0",
+    "grunt": "1.0.1",
+    "grunt-eslint": "19.0.0",
+    "istanbul": "^0.4.5",
     "mocha": "^3.2.0",
     "sinon": "^1.17.7"
   }

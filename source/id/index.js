@@ -7,26 +7,25 @@ const Chance = require('chance');
 let id;
 
 function createId(name) {
-  if(['production', 'prod'].indexOf(process.env.NODE_ENV) === -1){
+  if (['production', 'prod'].indexOf(process.env.NODE_ENV) === -1) {
     const ch = new Chance();
     return Promise.resolve(`${name}-${ch.string({
       length: 10,
       pool: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
     })}`);
-  }else{
-    return new Promise((resolve, reject) => {
-      getEC2Id()
-      .then((ec2Id) => {
-        const ts = (new DateObj()).getTimestamp();
-        resolve(`${name}-${ec2Id}-${process.pid}-${ts}`)
-      })
-      .catch(reject);
-    });
   }
+  return new Promise((resolve, reject) => {
+    getEC2Id()
+    .then((ec2Id) => {
+      const ts = (new DateObj()).getTimestamp();
+      resolve(`${name}-${ec2Id}-${process.pid}-${ts}`);
+    })
+    .catch(reject);
+  });
 }
 
 function getId(name) {
-  if(id){
+  if (id) {
     return Promise.resolve(id);
   }
 
@@ -42,4 +41,4 @@ function getId(name) {
 
 module.exports = {
   getId,
-}
+};

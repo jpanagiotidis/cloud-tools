@@ -8,7 +8,7 @@ class DateObj {
   }
 
   getTimestamp() {
-    return parseInt(this.obj.format('x'));
+    return parseInt(this.obj.format('x'), 10);
   }
 
   getFormatted(format) {
@@ -20,7 +20,7 @@ class DateObj {
   }
 }
 
-function getTimestamp(value){
+function getTimestamp(value) {
   return (new DateObj(value)).getTimestamp();
 }
 

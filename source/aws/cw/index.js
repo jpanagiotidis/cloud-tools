@@ -6,4 +6,4 @@ const utils = require('./utils.js');
 module.exports = {
   CWLogs,
   utils,
-}
+};

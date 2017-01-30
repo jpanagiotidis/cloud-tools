@@ -3,41 +3,39 @@
 const sinon = require('sinon');
 const expect = require('chai').expect;
 const config = require('../../source/aws/config.js');
+const aws = require('aws-sdk');
 const _ = require('lodash');
 
 describe('AWS Config Tests Suite', function(){
-  beforeEach(function(){
-    const keys = _.chain(require.cache)
-    .map((x, k) => k)
-    .filter(
-      (x) => (x.indexOf('node_modules/aws-sdk') !== -1)
-    )
-    .value();
-    // console.log(keys);
-    _.each(keys, x => {
-      console.log('DELETING', x);
-      // delete require.cache[x];
-    });
-  });
-
   it('has a services data object with correct api versions', function(){
     expect(config.services).to.be.an('object');
     expect(config.services.SQS.apiVersion).to.be.equal('2012-11-05');
+    expect(config.services.CloudWatchLogs.apiVersion).to.be.equal('2014-03-28');
   });
 
-  it('has a setConfig function', function(){
-    expect(config.setConfig).to.be.a('function');
+  describe('getConfig tests', function() {
+    it('has a getConfig function', function(){
+      expect(config.getConfig).to.be.a('function');
+    });
+
+    it('it returns the aws global configuration object', function() {
+      const c = config.getConfig();
+      expect(c).to.be.eql(aws.config);
+    });
   });
 
-  it('has a getConfig function', function(){
-    expect(config.getConfig).to.be.a('function');
-  });
+  describe('setConfig tests', function() {
+    it('has a setConfig function', function() {
+      expect(config.setConfig).to.be.a('function');
+    });
 
-  it('a', function(){
-    const config = require('../../source/aws/config.js');
-  });
-
-  it('b', function(){
-    const config = require('../../source/aws/config.js');
+    it('it updates the aws global configuration object', function() {
+      config.setConfig({
+        maxRetries: 10,
+      })
+      const c = config.getConfig();
+      expect(c).to.have.property('maxRetries', 10);
+      expect(aws.config).to.have.property('maxRetries', 10);
+    });
   });
 });

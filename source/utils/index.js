@@ -1,7 +1,7 @@
 'use strict';
 
 function sleep(value) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     setTimeout(() => {
       resolve();
     }, value);
@@ -9,7 +9,8 @@ function sleep(value) {
 }
 
 function stringBytes(s) {
-  return ~-encodeURI(s).split(/%..|./).length;
+  // eslint-disable-next-line no-bitwise
+  return ~-encodeURI(s || '').split(/%..|./).length;
 }
 
 function jsonSize(s) {

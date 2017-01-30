@@ -2,7 +2,7 @@
 
 const _ = require('lodash');
 
-function chain(promises){
+function chain(promises) {
   return new Promise((resolve, reject) => {
     let out = Promise.resolve();
     let e;
@@ -11,10 +11,11 @@ function chain(promises){
     promises.forEach((p) => {
       out = out.then((prev) => {
         results.push(prev);
-        if(!e){
+        if (!e) {
           const args = _.isArray(p.arguments) ? p.arguments : [];
-          return p.promise.apply(undefined, p.arguments);
+          return p.promise.apply(undefined, args);
         }
+        return Promise.reject();
       })
       .catch((err) => {
         e = new Error();
@@ -33,4 +34,4 @@ function chain(promises){
 
 module.exports = {
   chain,
-}
+};

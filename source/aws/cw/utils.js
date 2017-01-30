@@ -3,27 +3,38 @@
 const _ = require('lodash');
 const jsonSize = require('../../utils').jsonSize;
 
+function sortLogs(logs) {
+  return logs.sort((a, b) => {
+    if (a.timestamp > b.timestamp) {
+      return 1;
+    } else if (a.timestamp < b.timestamp) {
+      return -1;
+    }
+    return 0;
+  });
+}
+
 function prepareLogsBatches(logs) {
-  if(!_.isArray(logs) || logs.length === 0){
+  if (!_.isArray(logs) || logs.length === 0) {
     return [];
   }
 
   const out = [];
-  const threshold = 1000*60*60*23;
+  const threshold = 1000 * 60 * 60 * 23;
 
-  let sLogs = sortLogs(logs);
+  const sLogs = sortLogs(logs);
   let batch = [];
   out.push(batch);
   let cTimestamp = sLogs[0].timestamp;
   let cSize = 0;
   _.each(sLogs, (l) => {
-    let tempSize = jsonSize(l);
-    if(
+    const tempSize = jsonSize(l);
+    if (
       cSize + tempSize < 1000 &&
       l.timestamp - cTimestamp < threshold
     ) {
       batch.push(l);
-    }else{
+    } else {
       batch = [];
       out.push(batch);
       batch.push(l);
@@ -33,18 +44,6 @@ function prepareLogsBatches(logs) {
   });
 
   return out;
-}
-
-function sortLogs(logs) {
-  return logs.sort((a, b) => {
-    if(a.timestamp > b.timestamp){
-      return 1;
-    }else if(a.timestamp < b.timestamp){
-      return -1;
-    }else{
-      return 0;
-    }
-  });
 }
 
 module.exports = {
