@@ -1,6 +1,10 @@
 'use strict';
 
 const _ = require('lodash');
+const Chance = require('chance');
+const crypto = require('crypto');
+
+const chance = new Chance();
 
 function AWSStubGenerator(data) {
   data = data || {};
@@ -19,23 +23,44 @@ function AWSStubGenerator(data) {
   return stub;
 }
 
-module.exports = {
-  AWSStubGenerator,
+function getAWSString(length) {
+  return chance.string({
+    pool: 'abcdefghijklmnopqrstuvwxyz0123456789',
+    length,
+  });
 }
 
-/*
- * ON SUCCESS
-{ ResponseMetadata: { RequestId: 'f56a95a1-9c9a-5e1b-9528-c55c436c242f' },
-  MD5OfMessageBody: 'ffa3ca183028fe4cf7d6f32bb290bceb',
-  MessageId: '8e2b4104-423c-46f0-b718-62616b6918d6' }
+function getId(){
+  const out = [];
+  out.push(getAWSString(8));
+  out.push(getAWSString(4));
+  out.push(getAWSString(4));
+  out.push(getAWSString(4));
+  out.push(getAWSString(12));
+  return out.join('-');
+}
 
- * QUEUE doesnt exist
- { [AWS.SimpleQueueService.NonExistentQueue: The specified queue does not exist for this wsdl version.]
-  message: 'The specified queue does not exist for this wsdl version.',
-  code: 'AWS.SimpleQueueService.NonExistentQueue',
-  time: Sun Jan 22 2017 00:18:23 GMT+0200 (EET),
-  requestId: '9506a769-d049-5ce7-a3bb-f7943026e3fa',
-  statusCode: 400,
-  retryable: false,
-  retryDelay: 20.15042775310576 }
-*/
+function responseBase() {
+  return {
+    ResponseMetadata: {
+      RequestId: getId(),
+    },
+  };
+}
+
+const responseGenerator = {
+  SQS: {
+    sendMessage: (msg) => (Object.assign(
+      responseBase(),
+      {
+        MD5OfMessageBody: crypto.createHash('md5').update(msg).digest("hex"),
+        MessageId: getId(),
+      }
+    ))
+  },
+};
+
+module.exports = {
+  AWSStubGenerator,
+  responseGenerator,
+}

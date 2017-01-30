@@ -9,20 +9,13 @@ const sqs = require('../../source/aws/sqs/producer.js');
 const AWSStubGenerator = stubs.AWSStubGenerator;
 const errorMsg = sqs.ERROR_UNDEFINED_QUEUE;
 const SQSProducer = sqs.SQSProducer;
+const sendMessageResponse = stubs.responseGenerator.SQS.sendMessage;
 
 const sqsStub = AWSStubGenerator({
   promises: [
     {
       name: 'sendMessage',
-      callback: msg => (
-        Promise.resolve({
-          ResponseMetadata: {
-            RequestId: 'f56a95a1-9c9a-5e1b-9528-c55c436c242f'
-          },
-          MD5OfMessageBody: 'ffa3ca183028fe4cf7d6f32bb290bceb',
-          MessageId: '8e2b4104-423c-46f0-b718-62616b6918d6',
-        })
-      )
+      callback: msg => (Promise.resolve(sendMessageResponse('xcv')))
     },
   ],
 });

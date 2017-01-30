@@ -86,7 +86,7 @@ class CWLogs {
 
   putLogs(data) {
     if (data.length === 0) {
-      debug(debugName, 'putLogs: No data to send!');
+      debug(debugName, 'putLogs: No data to send!', data);
       return Promise.resolve();
     }
     const batches = prepareLogsBatches(data);
@@ -102,6 +102,10 @@ class CWLogs {
   }
 
   putBatch(data) {
+    if (data.length === 0) {
+      debug(debugName, 'putBatch: No data to send!', data);
+      return Promise.resolve();
+    }
     debug(debugName, 'putBatch: Start sending data', data);
     return this.cw.putLogEvents({
       logEvents: data,
