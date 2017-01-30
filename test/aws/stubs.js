@@ -1,38 +1,26 @@
 'use strict';
 
-function SQSStub(){}
+const _ = require('lodash');
 
-SQSStub.prototype.sendMessage = function(msg) {
-  return {
-    promise() {
-      return Promise.resolve({
-        ResponseMetadata: {
-          RequestId: 'f56a95a1-9c9a-5e1b-9528-c55c436c242f'
-        },
-        MD5OfMessageBody: 'ffa3ca183028fe4cf7d6f32bb290bceb',
-        MessageId: '8e2b4104-423c-46f0-b718-62616b6918d6',
-      });
+function AWSStubGenerator(data) {
+  data = data || {};
+  const stub = function(){};
+
+  _.each(data.promises, p => {
+    if(p.name && p.callback) {
+      stub.prototype[p.name] = (data) => {
+        return {
+          promise: p.callback.bind(null, data),
+        };
+      };
     }
-  }
-}
+  });
 
-function SQSErrorStub(){}
-
-SQSErrorStub.prototype.sendMessage = function(msg) {
-  return {
-    promise() {
-      const e = new Error()
-      e.message = 'The request has failed due to a temporary failure of the server.';
-      e.code = 'AWS.SimpleQueueService.ServiceUnavailable';
-      e.status = 503;
-      return Promise.reject(e);
-    }
-  }
+  return stub;
 }
 
 module.exports = {
-  SQSStub,
-  SQSErrorStub,
+  AWSStubGenerator,
 }
 
 /*

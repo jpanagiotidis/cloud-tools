@@ -4,11 +4,42 @@ const sinon = require('sinon');
 const expect = require('chai').expect;
 const aws = require('aws-sdk');
 const stubs = require('./stubs.js');
-const SQSStub = stubs.SQSStub;
-const SQSErrorStub = stubs.SQSErrorStub;
+const AWSStubGenerator = stubs.AWSStubGenerator;
 const sqs = require('../../source/aws/sqs/producer.js');
 const errorMsg = sqs.ERROR_UNDEFINED_QUEUE;
 const SQSProducer = sqs.SQSProducer;
+
+const sqsStub = AWSStubGenerator({
+  promises: [
+    {
+      name: 'sendMessage',
+      callback: msg => (
+        Promise.resolve({
+          ResponseMetadata: {
+            RequestId: 'f56a95a1-9c9a-5e1b-9528-c55c436c242f'
+          },
+          MD5OfMessageBody: 'ffa3ca183028fe4cf7d6f32bb290bceb',
+          MessageId: '8e2b4104-423c-46f0-b718-62616b6918d6',
+        })
+      )
+    },
+  ],
+});
+
+const sqsErrorStub = AWSStubGenerator({
+  promises: [
+    {
+      name: 'sendMessage',
+      callback: msg => {
+        const e = new Error()
+        e.message = 'The request has failed due to a temporary failure of the server.';
+        e.code = 'AWS.SimpleQueueService.ServiceUnavailable';
+        e.status = 503;
+        return Promise.reject(e);
+      }
+    },
+  ],
+});
 
 const dummyQueue = 'dummyQueue';
 const dummyString = 'some string';
@@ -18,22 +49,22 @@ const dummyObject = {
 };
 const dummyRegion = 'dummy-region';
 
-describe('AWS SQS Tests Suite', function(){
-  describe('SQSProducer Tests', function() {
-    it('has a SQSProducer class', function() {
-      expect(SQSProducer).to.be.a('function');
-      const prod = new SQSProducer();
-      expect(prod).to.be.an('object');
-    });
+describe('SQSProducer Tests', function() {
+  it('has a SQSProducer class', function() {
+    expect(SQSProducer).to.be.a('function');
+    const prod = new SQSProducer();
+    expect(prod).to.be.an('object');
+  });
 
+  describe('publish tests', function() {
     it('has a publish method', function() {
       const prod = new SQSProducer();
       expect(prod.publish).to.be.a('function');
     });
 
     it('calls the sqs sendMessage with correct arguments', sinon.test(function(done) {
-      const stub = this.stub(aws, 'SQS', SQSStub);
-      const spy = this.spy(SQSStub.prototype, 'sendMessage');
+      const stub = this.stub(aws, 'SQS', sqsStub);
+      const spy = this.spy(sqsStub.prototype, 'sendMessage');
       const prod = new SQSProducer(dummyQueue);
       prod.publish(dummyString)
       .then(res => {
@@ -46,8 +77,8 @@ describe('AWS SQS Tests Suite', function(){
     }));
 
     it('if sqs sendMessage fails the error is propagated', sinon.test(function(done) {
-      const stub = this.stub(aws, 'SQS', SQSErrorStub);
-      const spy = this.spy(SQSErrorStub.prototype, 'sendMessage');
+      const stub = this.stub(aws, 'SQS', sqsErrorStub);
+      const spy = this.spy(sqsErrorStub.prototype, 'sendMessage');
       const prod = new SQSProducer(dummyQueue);
       prod.publish(dummyString)
       .then(res => {
@@ -62,8 +93,8 @@ describe('AWS SQS Tests Suite', function(){
     }));
 
     it('supports json messages', sinon.test(function(done) {
-      const stub = this.stub(aws, 'SQS', SQSStub);
-      const spy = this.spy(SQSStub.prototype, 'sendMessage');
+      const stub = this.stub(aws, 'SQS', sqsStub);
+      const spy = this.spy(sqsStub.prototype, 'sendMessage');
       const prod = new SQSProducer(dummyQueue);
       prod.publish(dummyObject)
       .then(res => {
@@ -86,7 +117,9 @@ describe('AWS SQS Tests Suite', function(){
         done();
       })
     });
+  });
 
+  describe('getRegion tests', function() {
     it('has a getRegion method', function() {
       const prod = new SQSProducer();
       expect(prod.getRegion).to.be.a('function');
@@ -96,6 +129,20 @@ describe('AWS SQS Tests Suite', function(){
       const prod = new SQSProducer(dummyQueue, {
         region: dummyRegion,
       });
+
+      expect(prod.getRegion()).to.be.equal(dummyRegion);
+    });
+  });
+
+  describe('setRegion tests', function() {
+    it('has a setRegion method', function() {
+      const prod = new SQSProducer();
+      expect(prod.setRegion).to.be.a('function');
+    });
+
+    it('changes the sqs region', function() {
+      const prod = new SQSProducer(dummyQueue);
+      prod.setRegion(dummyRegion);
 
       expect(prod.getRegion()).to.be.equal(dummyRegion);
     });

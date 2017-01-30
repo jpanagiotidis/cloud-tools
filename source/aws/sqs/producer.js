@@ -26,6 +26,12 @@ class SQSProducer extends SQSEntity {
   getRegion() {
     return this.sqs.config.region;
   }
+
+  setRegion(region) {
+    this.sqs.config.update({
+      region,
+    });
+  }
 }
 
 module.exports = {
