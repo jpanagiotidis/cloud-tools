@@ -60,7 +60,15 @@ const responseGenerator = {
   },
 };
 
+function dataGenerator(length) {
+  return chance.string({
+    pool: 'abcdefghijklmnopqrstuvwxyz      ',
+    length,
+  });
+};
+
 module.exports = {
   AWSStubGenerator,
   responseGenerator,
-}
+  dataGenerator,
+};
