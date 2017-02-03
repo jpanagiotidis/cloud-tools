@@ -1,6 +1,5 @@
 'use strict';
 
-const sinon = require('sinon');
 const expect = require('chai').expect;
 const utils = require('../../source/aws/cw/utils.js');
 const getData = require('./stubs.js').dataGenerator;

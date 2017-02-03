@@ -46,13 +46,27 @@ class CWLogs {
     });
   }
 
+  setSequenceToken(token) {
+    this.sequenceToken = token;
+  }
+
+  getSequenceToken() {
+    return this.sequenceToken;
+  }
+
   checkGroupExists() {
     return this.cw.describeLogGroups({
       logGroupNamePrefix: this.groupName,
     }).promise()
     .then(
-      res => (Promise.resolve(res.logGroups.length > 0)
-    ));
+      (res) => {
+        const group = res.logGroups.filter(
+          g => (g.logGroupName === this.groupName)
+        )[0];
+
+        return Promise.resolve(!!group);
+      }
+    );
   }
 
   createGroup() {
@@ -71,7 +85,7 @@ class CWLogs {
         s => (s.logStreamName === this.streamName)
       )[0];
       if (stream) {
-        this.sequenceToken = stream.uploadSequenceToken;
+        this.setSequenceToken(stream.uploadSequenceToken);
       }
       return Promise.resolve(!!stream);
     });
@@ -111,11 +125,11 @@ class CWLogs {
       logEvents: data,
       logGroupName: this.groupName,
       logStreamName: this.streamName,
-      sequenceToken: this.sequenceToken,
+      sequenceToken: this.getSequenceToken(),
     }).promise()
     .then((res) => {
       debug(debugName, 'putBatch: Sending data completed');
-      this.sequenceToken = res.nextSequenceToken;
+      this.setSequenceToken(res.nextSequenceToken);
       return Promise.resolve();
     });
   }
