@@ -7,7 +7,7 @@ const Chance = require('chance');
 let id;
 
 function createId(name) {
-  if (['production', 'prod'].indexOf(process.env.NODE_ENV) === -1) {
+  if (['development', 'dev'].indexOf(process.env.NODE_ENV) !== -1) {
     const ch = new Chance();
     return Promise.resolve(`${name}-${ch.string({
       length: 10,

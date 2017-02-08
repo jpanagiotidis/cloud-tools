@@ -1,8 +1,10 @@
 'use strict';
 
 const _ = require('lodash');
+const debug = require('../../debug');
 const SQSEntity = require('./entity.js').SQSEntity;
 
+const debugName = 'SQSProducer';
 const ERROR_UNDEFINED_QUEUE = 'The queue URL is undefined';
 
 class SQSProducer extends SQSEntity {
@@ -17,6 +19,12 @@ class SQSProducer extends SQSEntity {
       message = JSON.stringify(data);
     }
 
+    if (['development', 'dev'].indexOf(process.env.NODE_ENV) !== -1) {
+      debug(debugName, 'fake publish message:', message, 'to queue', queueURL);
+      return Promise.resolve();
+    }
+
+    debug(debugName, 'aws publish message:', message, 'to queue', queueURL);
     return this.sqs.sendMessage({
       MessageBody: message,
       QueueUrl: queueURL,

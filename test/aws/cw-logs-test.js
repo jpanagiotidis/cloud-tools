@@ -308,7 +308,7 @@ describe('CWLogs Constructor Tests', function() {
         const tokenA = spySetSequenceToken.args[0][0];
         const tokenB = spySetSequenceToken.args[1][0];
         expect(spyPutLogs.args[1][0]).to.have.property('sequenceToken', tokenA);
-        expect(tokenA).to.be.not.equal(tokenB)
+        expect(tokenA).to.be.not.equal(tokenB);
         done();
       })
       .catch(done);
