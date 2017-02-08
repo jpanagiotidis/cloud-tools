@@ -15,7 +15,7 @@ const sqsStub = AWSStubGenerator({
   promises: [
     {
       name: 'sendMessage',
-      callback: msg => (Promise.resolve(sendMessageResponse('xcv')))
+      callback: msg => (Promise.resolve(sendMessageResponse('test message')))
     },
   ],
 });

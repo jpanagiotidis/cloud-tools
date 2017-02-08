@@ -3,7 +3,14 @@
 const _ = require('lodash');
 const jsonSize = require('../../utils').jsonSize;
 
+const TIME_THRESHOLD = 1000 * 60 * 60 * 23;
+const SIZE_THRESHOLD = 1000000;
+
 function sortLogs(logs) {
+  if (!_.isArray(logs)) {
+    throw new Error('An array was expected');
+  }
+
   return logs.sort((a, b) => {
     if (a.timestamp > b.timestamp) {
       return 1;
@@ -20,7 +27,6 @@ function prepareLogsBatches(logs) {
   }
 
   const out = [];
-  const threshold = 1000 * 60 * 60 * 23;
 
   const sLogs = sortLogs(logs);
   let batch = [];
@@ -30,9 +36,10 @@ function prepareLogsBatches(logs) {
   _.each(sLogs, (l) => {
     const tempSize = jsonSize(l);
     if (
-      cSize + tempSize < 1000 &&
-      l.timestamp - cTimestamp < threshold
+      cSize + tempSize < SIZE_THRESHOLD &&
+      l.timestamp - cTimestamp < TIME_THRESHOLD
     ) {
+      cSize += tempSize;
       batch.push(l);
     } else {
       batch = [];
