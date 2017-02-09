@@ -1,6 +1,6 @@
 {
   "name": "cloud-tools",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Cloud Tools for NodeJS",
   "main": "index.js",
   "engines": {
@@ -14,6 +14,10 @@
   },
   "author": "",
   "license": "ISC",
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/jpanagiotidis/cloud-tools"
+  },
   "dependencies": {
     "aws-sdk": "^2.7.25",
     "chance": "^1.0.4",
