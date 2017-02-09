@@ -1,7 +1,7 @@
 'use strict';
 
 const getEC2Id = require('../aws').ec2.getInstanceId;
-const debug = require('../../debug');
+const debug = require('../debug');
 const DateObj = require('../date-utils').DateObj;
 const Chance = require('chance');
 
