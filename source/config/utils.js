@@ -29,7 +29,7 @@ function bool(key, defaultValue) {
 
 function check() {
   if (missingEnvs.length > 0) {
-    const err = new Error(ERROR_MISSING_ENV);
+    const err = new Error(`${ERROR_MISSING_ENV} [${missingEnvs.join(', ')}]`);
     err.missingEnvs = missingEnvs;
     throw err;
   }
