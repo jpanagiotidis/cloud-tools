@@ -104,7 +104,7 @@ describe('MessageUtils error message Tests', function() {
     const errors = getCommonErrorTypes();
     expect(errors).to.have.property('UNHANDLED_REJECTION', 'UNHANDLED_REJECTION');
     expect(errors).to.have.property('UNHANDLED_EXCEPTION', 'UNHANDLED_EXCEPTION');
-    expect(errors).to.have.property('LOG_QUEUE_ERROR', 'LOG_QUEUE_ERROR');
+    expect(errors).to.have.property('DEAD_LETTER_QUEUE_MESSAGE', 'DEAD_LETTER_QUEUE_MESSAGE');
     expect(errors).to.have.property('SYNTAX_ERROR', 'SYNTAX_ERROR');
     expect(errors).to.have.property('TYPE_ERROR', 'TYPE_ERROR');
   });
