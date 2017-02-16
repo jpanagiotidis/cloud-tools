@@ -4,10 +4,10 @@ const expect = require('chai').expect;
 const sinon = require('sinon');
 const path = require('path');
 
-const indexPath = path.join(__dirname, '../../source/messages-utils/index.js');
-const errorPath = path.join(__dirname, '../../source/messages-utils/error.js');
-const configPath = path.join(__dirname, '../../source/messages-utils/config.js');
-const basePath = path.join(__dirname, '../../source/messages-utils/base.js');
+const indexPath = path.join(__dirname, '../../source/message-utils/index.js');
+const errorPath = path.join(__dirname, '../../source/message-utils/error.js');
+const configPath = path.join(__dirname, '../../source/message-utils/config.js');
+const basePath = path.join(__dirname, '../../source/message-utils/base.js');
 const idPath = path.join(__dirname, '../../source/id/index.js');
 const awsPath = path.join(__dirname, '../../source/aws/index.js');
 const ec2Path = path.join(__dirname, '../../source/aws/ec2.js');
