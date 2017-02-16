@@ -152,6 +152,12 @@ describe('MessageUtils Base Tests', function() {
     expect(config.VALUES.TYPE).to.have.property('AUDIT', 'AUDIT');
     expect(config.VALUES.TYPE).to.have.property('ERROR', 'ERROR');
 
+    expect(config.VALUES.ERROR_TYPE).to.have.property('UNHANDLED_REJECTION', 'UNHANDLED_REJECTION');
+    expect(config.VALUES.ERROR_TYPE).to.have.property('UNHANDLED_EXCEPTION', 'UNHANDLED_EXCEPTION');
+    expect(config.VALUES.ERROR_TYPE).to.have.property('LOG_QUEUE_ERROR', 'LOG_QUEUE_ERROR');
+    expect(config.VALUES.ERROR_TYPE).to.have.property('SYNTAX_ERROR', 'SYNTAX_ERROR');
+    expect(config.VALUES.ERROR_TYPE).to.have.property('TYPE_ERROR', 'TYPE_ERROR');
+
     expect(config.ERRORS.MISSING_NAME_AND_ENV_ARGS).to.be.a('string');
     expect(config.ERRORS.NOT_INITIALIZED).to.be.a('string');
   });

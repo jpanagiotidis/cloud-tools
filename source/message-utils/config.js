@@ -21,6 +21,13 @@ const config = {
       AUDIT: 'AUDIT',
       ERROR: 'ERROR',
     },
+    ERROR_TYPE: {
+      UNHANDLED_REJECTION: 'UNHANDLED_REJECTION',
+      UNHANDLED_EXCEPTION: 'UNHANDLED_EXCEPTION',
+      LOG_QUEUE_ERROR: 'LOG_QUEUE_ERROR',
+      SYNTAX_ERROR: 'SYNTAX_ERROR',
+      TYPE_ERROR: 'TYPE_ERROR',
+    },
   },
   ERRORS: {
     MISSING_NAME_AND_ENV_ARGS: 'Service Name and Environment Name are mandatory arguments',
