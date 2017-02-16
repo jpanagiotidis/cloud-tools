@@ -10,7 +10,7 @@ function fetchId() {
   return new Promise((resolve, reject) => (
     meta.request('/latest/meta-data/instance-id', (err, data) => {
       if (err) {
-        return reject('EC2 instance unreachable');
+        return reject(new Error('EC2 instance unreachable'));
       }
       id = data;
       return resolve(data);

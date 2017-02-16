@@ -57,6 +57,13 @@ describe('SQSProducer Tests', function() {
     });
 
     it('calls the sqs sendMessage with correct arguments', sinon.test(function(done) {
+      this.stub(process, 'env', Object.assign(
+        {},
+        process.env,
+        {
+          NODE_ENV: 'production',
+        }
+      ));
       const stub = this.stub(aws, 'SQS', sqsStub);
       const spy = this.spy(sqsStub.prototype, 'sendMessage');
       const prod = new SQSProducer(dummyQueue);
@@ -71,6 +78,13 @@ describe('SQSProducer Tests', function() {
     }));
 
     it('if sqs sendMessage fails the error is propagated', sinon.test(function(done) {
+      this.stub(process, 'env', Object.assign(
+        {},
+        process.env,
+        {
+          NODE_ENV: 'production',
+        }
+      ));
       const stub = this.stub(aws, 'SQS', sqsErrorStub);
       const spy = this.spy(sqsErrorStub.prototype, 'sendMessage');
       const prod = new SQSProducer(dummyQueue);
@@ -87,6 +101,13 @@ describe('SQSProducer Tests', function() {
     }));
 
     it('supports json messages', sinon.test(function(done) {
+      this.stub(process, 'env', Object.assign(
+        {},
+        process.env,
+        {
+          NODE_ENV: 'production',
+        }
+      ));
       const stub = this.stub(aws, 'SQS', sqsStub);
       const spy = this.spy(sqsStub.prototype, 'sendMessage');
       const prod = new SQSProducer(dummyQueue);

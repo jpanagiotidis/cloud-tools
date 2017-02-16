@@ -21,6 +21,12 @@ describe('Id Module Tests', function(){
     delete require.cache[modulePath];
   });
 
+  afterEach(function(){
+    delete require.cache[awsPath];
+    delete require.cache[ec2Path];
+    delete require.cache[modulePath];
+  });
+
   it('has getId function', function(){
     const id = require(modulePath);
     expect(id.getId).to.be.a('function');
