@@ -24,6 +24,11 @@ function getError(errorType, data) {
   );
 }
 
+function getCommonErrorTypes() {
+  return config.VALUES.ERROR_TYPE;
+}
+
 module.exports = {
   getError,
+  getCommonErrorTypes,
 };
