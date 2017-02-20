@@ -10,10 +10,25 @@ const idPath = path.join(__dirname, '../../source/id/index.js');
 const awsPath = path.join(__dirname, '../../source/aws/index.js');
 const ec2Path = path.join(__dirname, '../../source/aws/ec2.js');
 
+const ec2Module = require(ec2Path);
+
 const dummyName = 'dummy_name';
 const dummyEnv = 'dummy_env';
+const dummyId = '123';
 
-describe('MessageUtils Base Tests', function() {
+describe('MessageUtils Config Tests', function() {
+  before(function() {
+    sinon.config = {
+      useFakeTimers: false,
+    };
+  });
+
+  after(function() {
+    sinon.config = {
+      useFakeTimers: true,
+    };
+  });
+
   beforeEach(function() {
     delete require.cache[indexPath];
     delete require.cache[modulePath];
@@ -50,12 +65,8 @@ describe('MessageUtils Base Tests', function() {
   });
 
   it('init should complete if args are provided', sinon.test(function(done) {
-    this.stub(process, 'env', Object.assign(
-      {},
-      process.env,
-      {
-        NODE_ENV: 'development',
-      }
+    this.stub(require('../../source/aws/ec2.js'), 'getInstanceId', () => (
+      Promise.resolve(dummyId)
     ));
 
     const init = require(indexPath).init;
@@ -105,12 +116,8 @@ describe('MessageUtils Base Tests', function() {
   });
 
   it('returns true if it initialized', sinon.test(function(done) {
-    this.stub(process, 'env', Object.assign(
-      {},
-      process.env,
-      {
-        NODE_ENV: 'development',
-      }
+    this.stub(require('../../source/aws/ec2.js'), 'getInstanceId', () => (
+      Promise.resolve(dummyId)
     ));
 
     const init = require(indexPath).init;

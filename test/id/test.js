@@ -15,6 +15,12 @@ const fakeTS = (new Date(fakeTime)).getTime();
 const pid = process.pid;
 
 describe('Id Module Tests', function(){
+  before(function() {
+    sinon.config = {
+      useFakeTimers: true,
+    };
+  });
+
   beforeEach(function(){
     delete require.cache[awsPath];
     delete require.cache[ec2Path];
@@ -32,110 +38,65 @@ describe('Id Module Tests', function(){
     expect(id.getId).to.be.a('function');
   });
 
-  it('if NODE_ENV is not production then a dummy value must be returned', sinon.test(function(done){
-    this.stub(process, 'env', Object.assign(
-      {},
-      process.env,
-      {
-        'NODE_ENV': 'development',
-      }
+  it('calls the ec2 getInstanceId function', sinon.test(function(done) {
+    const awsStub = this.stub(require(ec2Path), 'getInstanceId', () => (
+      Promise.resolve(fakeEC2Id)
     ));
-
-    const id = require(modulePath);
-
-    id.getId(serviceName)
-    .then((res) => {
-      expect(res).to.match(/^DUMMY_APP-[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]{10}$/);
-      done();
-    })
-    .catch(done);
-  }));
-
-  it('if NODE_ENV is production then ec2 meta must be called', sinon.test(function(done){
-    this.clock = sinon.useFakeTimers(fakeTS);
-    this.stub(process, 'env', Object.assign(
-      {},
-      process.env,
-      {
-        'NODE_ENV': 'production',
-      }
-    ));
-    const aws = require(awsPath);
-
-    const awsStub = this.stub(aws.ec2, 'getInstanceId', () => {
-      return Promise.resolve(fakeEC2Id);
-    });
 
     const id = require(modulePath);
 
     id.getId(serviceName)
     .then((res) => {
       expect(awsStub.callCount).to.be.equal(1);
-      expect(res).to.be.equal(`${serviceName}-${fakeEC2Id}-${pid}-${fakeTS}`);
       done();
     })
     .catch(done);
   }));
 
-  it('after the first call it returns a cached version', sinon.test(function(done){
+  it('has the correct format', sinon.test(function(done) {
     this.clock = sinon.useFakeTimers(fakeTS);
-    this.stub(process, 'env', Object.assign(
-      {},
-      process.env,
-      {
-        'NODE_ENV': 'production',
-      }
+    const awsStub = this.stub(require(ec2Path), 'getInstanceId', () => (
+      Promise.resolve(fakeEC2Id)
     ));
-
-    const aws = require(awsPath);
-
-    const awsStub = this.stub(aws.ec2, 'getInstanceId', () => {
-      return Promise.resolve(fakeEC2Id);
-    });
 
     const id = require(modulePath);
 
     id.getId(serviceName)
     .then((res) => {
       expect(awsStub.callCount).to.be.equal(1);
-      expect(res).to.be.equal(`${serviceName}-${fakeEC2Id}-${pid}-${fakeTS}`);
+      expect(res).to.be.equal(`${serviceName}-${fakeEC2Id}-${pid}-${fakeTS}`)
+      done();
     })
+    .catch(done);
+  }));
+
+  it('returns a cached version if it called multple times', sinon.test(function(done) {
+    this.clock = sinon.useFakeTimers(fakeTS);
+    const awsStub = this.stub(require(ec2Path), 'getInstanceId', () => (
+      Promise.resolve(fakeEC2Id)
+    ));
+
+    const id = require(modulePath);
+
+    let id_a;
+
+    id.getId(serviceName)
     .then((res) => {
+      expect(awsStub.callCount).to.be.equal(1);
+      id_a = res;
+      expect(res).to.be.equal(`${serviceName}-${fakeEC2Id}-${pid}-${fakeTS}`)
       return id.getId(serviceName);
     })
     .then((res) => {
       expect(awsStub.callCount).to.be.equal(1);
-      expect(res).to.be.equal(`${serviceName}-${fakeEC2Id}-${pid}-${fakeTS}`);
+      expect(res).to.be.equal(id_a);
+      return id.getId(serviceName);
+    })
+    .then((res) => {
+      expect(awsStub.callCount).to.be.equal(1);
+      expect(res).to.be.equal(id_a);
       done();
     })
     .catch(done);
-  }));
-
-  it('if aws throws error then getId throws error', sinon.test(function(done){
-    this.clock = sinon.useFakeTimers(fakeTS);
-    this.stub(process, 'env', Object.assign(
-      {},
-      process.env,
-      {
-        'NODE_ENV': 'production',
-      }
-    ));
-
-    const aws = require(awsPath);
-
-    const awsStub = this.stub(aws.ec2, 'getInstanceId', () => {
-      return Promise.reject();
-    });
-
-    const id = require(modulePath);
-
-    id.getId(serviceName)
-    .then((res) => {
-      done(new Error('It shouldn\'t succeed'));
-    })
-    .catch((err) => {
-      expect(awsStub.callCount).to.be.equal(1);
-      done();
-    });
   }));
 });
