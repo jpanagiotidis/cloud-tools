@@ -1,5 +1,6 @@
 'use strict';
 
+const FAKE = require('../config.js').other.FAKE;
 const _ = require('lodash');
 const debug = require('../../debug');
 const SQSEntity = require('./entity.js').SQSEntity;
@@ -19,7 +20,7 @@ class SQSProducer extends SQSEntity {
       message = JSON.stringify(data);
     }
 
-    if (['development', 'dev'].indexOf(process.env.NODE_ENV) !== -1) {
+    if (FAKE) {
       debug(debugName, 'fake publish message:', message, 'to queue', queueURL);
       return Promise.resolve();
     }
