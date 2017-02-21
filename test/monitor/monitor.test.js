@@ -63,14 +63,17 @@ describe('Monitor test suite', function(){
       expect(msgStub).to.have.property('calledOnce', true);
       expect(cwStub).to.have.property('calledOnce', true);
       expect(cwInitSpy).to.have.property('calledOnce', true);
-      process.removeListener('unhandledException', monitor.exceptionCb);
+      process.removeListener('uncaughtException', monitor.exceptionCb);
       process.removeListener('unhandledRejection', monitor.rejectionCb);
       done();
     })
     .catch(done);
   }));
 
-  it('on unhandledException logs are put into cloudwatch and then the application exits', sinon.test(function(done) {
+  it('on uncaughtException logs are put into cloudwatch and then the application exits', sinon.test(function(done) {
+    const originalException = process.listeners('uncaughtException').pop();
+    process.removeListener('uncaughtException', originalException);
+
     const exitCache = process.exit;
     process.exit = sinon.spy();
 
@@ -93,13 +96,14 @@ describe('Monitor test suite', function(){
     const monitor = require(monitorPath);
     monitor.init(dummyName, dummyEnv)
     .then(() => {
-      process.emit('unhandledException', dummyError);
+      process.emit('uncaughtException', dummyError);
       setTimeout(() => {
         expect(cwPutLogsSpy).to.have.property('calledOnce', true);
         expect(process.exit).to.have.property('calledOnce', true);
         process.exit = exitCache;
-        process.removeListener('unhandledException', monitor.exceptionCb);
+        process.removeListener('uncaughtException', monitor.exceptionCb);
         process.removeListener('unhandledRejection', monitor.rejectionCb);
+        process.on('uncaughtException', originalException);
         done();
       }, 50);
     })
@@ -134,7 +138,7 @@ describe('Monitor test suite', function(){
         expect(cwPutLogsSpy).to.have.property('calledOnce', true);
         expect(process.exit).to.have.property('calledOnce', true);
         process.exit = exitCache;
-        process.removeListener('unhandledException', monitor.exceptionCb);
+        process.removeListener('uncaughtException', monitor.exceptionCb);
         process.removeListener('unhandledRejection', monitor.rejectionCb);
         done();
       }, 50);

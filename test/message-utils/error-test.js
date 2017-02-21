@@ -63,7 +63,7 @@ describe('MessageUtils Error message Tests', function() {
       expect(msg.TIME_STAMP).to.be.an('number');
       expect(msg).to.have.property('ENVIRONMENT_NAME', dummyEnv);
       expect(msg.INSTANCE_ID.indexOf(dummyName)).to.be.equal(0);
-      expect(msg).to.have.property('TYPE', 'ERROR');
+      expect(msg).to.have.property('LOG_TYPE', 'ERROR');
       expect(msg).to.have.property('ERROR_TYPE', dummyErrorType);
       expect(msg).to.have.property('MESSAGE', dummyMessage);
       done();
@@ -96,7 +96,7 @@ describe('MessageUtils Error message Tests', function() {
     const getCommonErrorTypes = require(indexPath).getCommonErrorTypes;
     const errors = getCommonErrorTypes();
     expect(errors).to.have.property('UNHANDLED_REJECTION', 'UNHANDLED_REJECTION');
-    expect(errors).to.have.property('UNHANDLED_EXCEPTION', 'UNHANDLED_EXCEPTION');
+    expect(errors).to.have.property('UNCAUGHT_EXCEPTION', 'UNCAUGHT_EXCEPTION');
     expect(errors).to.have.property('DEAD_LETTER_QUEUE_MESSAGE', 'DEAD_LETTER_QUEUE_MESSAGE');
     expect(errors).to.have.property('SYNTAX_ERROR', 'SYNTAX_ERROR');
     expect(errors).to.have.property('TYPE_ERROR', 'TYPE_ERROR');

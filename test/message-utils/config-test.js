@@ -183,7 +183,7 @@ describe('MessageUtils Config Tests', function() {
     expect(config.KEYS).to.have.property('ENVIRONMENT_NAME', 'ENVIRONMENT_NAME');
     expect(config.KEYS).to.have.property('INSTANCE_ID', 'INSTANCE_ID');
     expect(config.KEYS).to.have.property('MESSAGE', 'MESSAGE');
-    expect(config.KEYS).to.have.property('TYPE', 'TYPE');
+    expect(config.KEYS).to.have.property('TYPE', 'LOG_TYPE');
     expect(config.KEYS).to.have.property('ERROR_TYPE', 'ERROR_TYPE');
 
     expect(config.VALUES.TYPE).to.have.property('INFO', 'INFO');
