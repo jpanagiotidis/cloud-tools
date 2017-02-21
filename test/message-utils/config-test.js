@@ -86,6 +86,37 @@ describe('MessageUtils Config Tests', function() {
     .catch(done);
   }));
 
+  it('if init is called again with different arguments, the latter call is rejected', sinon.test(function(done) {
+    this.stub(require('../../source/aws/ec2.js'), 'getInstanceId', () => (
+      Promise.resolve(dummyId)
+    ));
+
+    const init = require(indexPath).init;
+
+    init(dummyName, dummyEnv);
+    init(`${dummyName}2`, dummyEnv)
+    .then(() => {
+      done(new Error('it should be rejected'));
+    })
+    .catch((err) => {
+      done();
+    });
+  }));
+
+  it('if init is called more than once the same promise is returned', sinon.test(function(done) {
+    this.stub(require('../../source/aws/ec2.js'), 'getInstanceId', () => (
+      Promise.resolve(dummyId)
+    ));
+
+    const init = require(indexPath).init;
+
+    const p1 = init(dummyName, dummyEnv);
+    const p2 = init(dummyName, dummyEnv);
+
+    expect(p1).to.be.equal(p2);
+    done();
+  }));
+
   it('reject if getId is rejected', sinon.test(function(done) {
     this.stub(require('../../source/id/index.js'), 'getId', () => (Promise.reject(new Error('Connection error'))));
 

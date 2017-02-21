@@ -3,16 +3,17 @@
 const expect = require('chai').expect;
 const sinon = require('sinon');
 const path = require('path');
+const clearRequireCache = require('../testing-utils.js').clearRequireCache;
 
 const sourcePath = path.join(__dirname, '../../source/');
 
 describe('Entry point test suite', function(){
   beforeEach(function() {
-    delete require.cache;
+    clearRequireCache();
   });
 
   afterEach(function() {
-    delete require.cache;
+    clearRequireCache();
   });
 
   it('has the getId function', sinon.test(function(){

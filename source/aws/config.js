@@ -8,7 +8,7 @@ const bool = configUtils.bool;
 
 const configGlobal = {
   signatureVersion: 'v4',
-  region: process.env.AWS_SERVICE_REGION,
+  region: env('AWS_SERVICE_REGION', 'eu-west-1'),
   maxRetries: env('AWS_MAX_RETRIES', 5),
 };
 
