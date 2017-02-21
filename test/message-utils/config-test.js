@@ -10,10 +10,25 @@ const idPath = path.join(__dirname, '../../source/id/index.js');
 const awsPath = path.join(__dirname, '../../source/aws/index.js');
 const ec2Path = path.join(__dirname, '../../source/aws/ec2.js');
 
+const ec2Module = require(ec2Path);
+
 const dummyName = 'dummy_name';
 const dummyEnv = 'dummy_env';
+const dummyId = '123';
 
-describe('MessageUtils Base Tests', function() {
+describe('MessageUtils Config Tests', function() {
+  before(function() {
+    sinon.config = {
+      useFakeTimers: false,
+    };
+  });
+
+  after(function() {
+    sinon.config = {
+      useFakeTimers: true,
+    };
+  });
+
   beforeEach(function() {
     delete require.cache[indexPath];
     delete require.cache[modulePath];
@@ -50,12 +65,8 @@ describe('MessageUtils Base Tests', function() {
   });
 
   it('init should complete if args are provided', sinon.test(function(done) {
-    this.stub(process, 'env', Object.assign(
-      {},
-      process.env,
-      {
-        NODE_ENV: 'development',
-      }
+    this.stub(require('../../source/aws/ec2.js'), 'getInstanceId', () => (
+      Promise.resolve(dummyId)
     ));
 
     const init = require(indexPath).init;
@@ -73,6 +84,37 @@ describe('MessageUtils Base Tests', function() {
       done();
     })
     .catch(done);
+  }));
+
+  it('if init is called again with different arguments, the latter call is rejected', sinon.test(function(done) {
+    this.stub(require('../../source/aws/ec2.js'), 'getInstanceId', () => (
+      Promise.resolve(dummyId)
+    ));
+
+    const init = require(indexPath).init;
+
+    init(dummyName, dummyEnv);
+    init(`${dummyName}2`, dummyEnv)
+    .then(() => {
+      done(new Error('it should be rejected'));
+    })
+    .catch((err) => {
+      done();
+    });
+  }));
+
+  it('if init is called more than once the same promise is returned', sinon.test(function(done) {
+    this.stub(require('../../source/aws/ec2.js'), 'getInstanceId', () => (
+      Promise.resolve(dummyId)
+    ));
+
+    const init = require(indexPath).init;
+
+    const p1 = init(dummyName, dummyEnv);
+    const p2 = init(dummyName, dummyEnv);
+
+    expect(p1).to.be.equal(p2);
+    done();
   }));
 
   it('reject if getId is rejected', sinon.test(function(done) {
@@ -105,12 +147,8 @@ describe('MessageUtils Base Tests', function() {
   });
 
   it('returns true if it initialized', sinon.test(function(done) {
-    this.stub(process, 'env', Object.assign(
-      {},
-      process.env,
-      {
-        NODE_ENV: 'development',
-      }
+    this.stub(require('../../source/aws/ec2.js'), 'getInstanceId', () => (
+      Promise.resolve(dummyId)
     ));
 
     const init = require(indexPath).init;

@@ -9,10 +9,12 @@ const configPath = path.join(__dirname, '../../source/message-utils/config.js');
 const basePath = path.join(__dirname, '../../source/message-utils/base.js');
 const idPath = path.join(__dirname, '../../source/id/index.js');
 const awsPath = path.join(__dirname, '../../source/aws/index.js');
+const awsConfigPath = path.join(__dirname, '../../source/aws/config.js');
 const ec2Path = path.join(__dirname, '../../source/aws/ec2.js');
 
 const dummyName = 'dummy_name';
 const dummyEnv = 'dummy_env';
+const dummyId = '123';
 
 describe('MessageUtils Base Tests', function() {
   beforeEach(function() {
@@ -21,6 +23,7 @@ describe('MessageUtils Base Tests', function() {
     delete require.cache[basePath];
     delete require.cache[idPath];
     delete require.cache[awsPath];
+    delete require.cache[awsConfigPath];
     delete require.cache[ec2Path];
   });
 
@@ -30,6 +33,7 @@ describe('MessageUtils Base Tests', function() {
     delete require.cache[basePath];
     delete require.cache[idPath];
     delete require.cache[awsPath];
+    delete require.cache[awsConfigPath];
     delete require.cache[ec2Path];
   });
 
@@ -44,12 +48,8 @@ describe('MessageUtils Base Tests', function() {
   });
 
   it('has the correct attributes', sinon.test(function(done) {
-    this.stub(process, 'env', Object.assign(
-      {},
-      process.env,
-      {
-        NODE_ENV: 'development',
-      }
+    this.stub(require('../../source/aws/ec2.js'), 'getInstanceId', () => (
+      Promise.resolve(dummyId)
     ));
 
     const init = require(indexPath).init;

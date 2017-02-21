@@ -16,8 +16,9 @@ const dummyName = 'dummy_name';
 const dummyEnv = 'dummy_env';
 const dummyErrorType = 'dummy_type';
 const dummyMessage = 'some message';
+const dummyId = '123';
 
-describe('MessageUtils error message Tests', function() {
+describe('MessageUtils Error message Tests', function() {
   beforeEach(function() {
     delete require.cache[indexPath];
     delete require.cache[configPath];
@@ -49,12 +50,8 @@ describe('MessageUtils error message Tests', function() {
   });
 
   it('has the correct attributes', sinon.test(function(done) {
-    this.stub(process, 'env', Object.assign(
-      {},
-      process.env,
-      {
-        NODE_ENV: 'development',
-      }
+    this.stub(require('../../source/aws/ec2.js'), 'getInstanceId', () => (
+      Promise.resolve(dummyId)
     ));
 
     const init = require(indexPath).init;
@@ -75,12 +72,8 @@ describe('MessageUtils error message Tests', function() {
   }));
 
   it('if errorType isnt provided it throws an error', sinon.test(function(done) {
-    this.stub(process, 'env', Object.assign(
-      {},
-      process.env,
-      {
-        NODE_ENV: 'development',
-      }
+    this.stub(require('../../source/aws/ec2.js'), 'getInstanceId', () => (
+      Promise.resolve(dummyId)
     ));
 
     const init = require(indexPath).init;

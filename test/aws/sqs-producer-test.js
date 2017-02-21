@@ -3,12 +3,14 @@
 const sinon = require('sinon');
 const expect = require('chai').expect;
 const aws = require('aws-sdk');
+const _ = require('lodash');
 const stubs = require('./stubs.js');
-const sqs = require('../../source/aws/sqs/producer.js');
+const path = require('path');
 
+const modulePath = path.join(__dirname, '../../source/aws/index.js');
+const awsConfPath = path.join(__dirname, '../../source/aws/config.js');
+const sqsPath = path.join(__dirname, '../../source/aws/sqs/producer.js');
 const AWSStubGenerator = stubs.AWSStubGenerator;
-const errorMsg = sqs.ERROR_UNDEFINED_QUEUE;
-const SQSProducer = sqs.SQSProducer;
 const sendMessageResponse = stubs.responseGenerator.SQS.sendMessage;
 
 const sqsStub = AWSStubGenerator({
@@ -44,7 +46,21 @@ const dummyObject = {
 const dummyRegion = 'dummy-region';
 
 describe('SQSProducer Tests', function() {
+  beforeEach(function() {
+    delete require.cache[awsConfPath];
+    delete require.cache[sqsPath];
+    delete require.cache[modulePath];
+  });
+
+  afterEach(function() {
+    delete require.cache[awsConfPath];
+    delete require.cache[sqsPath];
+    delete require.cache[modulePath];
+  });
+
   it('has a SQSProducer constructor', function() {
+    const sqs = require(sqsPath);
+    const SQSProducer = sqs.SQSProducer;
     expect(SQSProducer).to.be.a('function');
     const prod = new SQSProducer();
     expect(prod).to.be.an('object');
@@ -52,20 +68,18 @@ describe('SQSProducer Tests', function() {
 
   describe('publish tests', function() {
     it('has a publish method', function() {
+      const sqs = require(sqsPath);
+      const SQSProducer = sqs.SQSProducer;
       const prod = new SQSProducer();
       expect(prod.publish).to.be.a('function');
     });
 
     it('calls the sqs sendMessage with correct arguments', sinon.test(function(done) {
-      this.stub(process, 'env', Object.assign(
-        {},
-        process.env,
-        {
-          NODE_ENV: 'production',
-        }
-      ));
+      this.stub(process, 'env', _.omit(process.env, 'AWS_FAKE'));
       const stub = this.stub(aws, 'SQS', sqsStub);
       const spy = this.spy(sqsStub.prototype, 'sendMessage');
+      const sqs = require(sqsPath);
+      const SQSProducer = sqs.SQSProducer;
       const prod = new SQSProducer(dummyQueue);
       prod.publish(dummyString)
       .then(res => {
@@ -78,15 +92,11 @@ describe('SQSProducer Tests', function() {
     }));
 
     it('if sqs sendMessage fails the error is propagated', sinon.test(function(done) {
-      this.stub(process, 'env', Object.assign(
-        {},
-        process.env,
-        {
-          NODE_ENV: 'production',
-        }
-      ));
+      this.stub(process, 'env', _.omit(process.env, 'AWS_FAKE'));
       const stub = this.stub(aws, 'SQS', sqsErrorStub);
       const spy = this.spy(sqsErrorStub.prototype, 'sendMessage');
+      const sqs = require(sqsPath);
+      const SQSProducer = sqs.SQSProducer;
       const prod = new SQSProducer(dummyQueue);
       prod.publish(dummyString)
       .then(res => {
@@ -101,15 +111,11 @@ describe('SQSProducer Tests', function() {
     }));
 
     it('supports json messages', sinon.test(function(done) {
-      this.stub(process, 'env', Object.assign(
-        {},
-        process.env,
-        {
-          NODE_ENV: 'production',
-        }
-      ));
+      this.stub(process, 'env', _.omit(process.env, 'AWS_FAKE'));
       const stub = this.stub(aws, 'SQS', sqsStub);
       const spy = this.spy(sqsStub.prototype, 'sendMessage');
+      const sqs = require(sqsPath);
+      const SQSProducer = sqs.SQSProducer;
       const prod = new SQSProducer(dummyQueue);
       prod.publish(dummyObject)
       .then(res => {
@@ -122,6 +128,9 @@ describe('SQSProducer Tests', function() {
     }));
 
     it('if no queue is defined the publish is rejected', function(done) {
+      const sqs = require(sqsPath);
+      const SQSProducer = sqs.SQSProducer;
+      const errorMsg = sqs.ERROR_UNDEFINED_QUEUE;
       const prod = new SQSProducer();
       prod.publish(dummyString)
       .then(() => {
@@ -132,15 +141,41 @@ describe('SQSProducer Tests', function() {
         done();
       })
     });
+
+    it('if AWS_FAKE is true then aws sdk is not called', sinon.test(function(done) {
+      this.stub(process, 'env', Object.assign(
+        {},
+        process.env,
+        {
+          AWS_FAKE: 'true',
+        }
+      ));
+
+      const stub = this.stub(aws, 'SQS', sqsStub);
+      const spy = this.spy(sqsStub.prototype, 'sendMessage');
+      const sqs = require(sqsPath);
+      const SQSProducer = sqs.SQSProducer;
+      const prod = new SQSProducer(dummyQueue);
+      prod.publish(dummyObject)
+      .then(res => {
+        expect(spy).to.have.property('callCount', 0);
+        done();
+      })
+      .catch(done);
+    }));
   });
 
   describe('getRegion tests', function() {
     it('has a getRegion method', function() {
+      const sqs = require(sqsPath);
+      const SQSProducer = sqs.SQSProducer;
       const prod = new SQSProducer();
       expect(prod.getRegion).to.be.a('function');
     });
 
     it('it returns the sqs region', function() {
+      const sqs = require(sqsPath);
+      const SQSProducer = sqs.SQSProducer;
       const prod = new SQSProducer(dummyQueue, {
         region: dummyRegion,
       });
@@ -151,11 +186,15 @@ describe('SQSProducer Tests', function() {
 
   describe('setRegion tests', function() {
     it('has a setRegion method', function() {
+      const sqs = require(sqsPath);
+      const SQSProducer = sqs.SQSProducer;
       const prod = new SQSProducer();
       expect(prod.setRegion).to.be.a('function');
     });
 
     it('changes the sqs region', function() {
+      const sqs = require(sqsPath);
+      const SQSProducer = sqs.SQSProducer;
       const prod = new SQSProducer(dummyQueue);
       prod.setRegion(dummyRegion);
 

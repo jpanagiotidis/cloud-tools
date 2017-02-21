@@ -33,11 +33,21 @@ const config = {
     MISSING_NAME_AND_ENV_ARGS: 'Service Name and Environment Name are mandatory arguments',
     NOT_INITIALIZED: 'Please initialize first by using the MessageUtils.init',
     UNDEFINED_ERROR_TYPE: 'The argument errorType is missing',
+    INCONSISTENT_ARGS: 'It has already initiated with different arguments',
   },
   DEBUG: 'MessagesUtils',
 };
 
+let initPromise;
+
 function init(serviceName, environmentName) {
+  if (initPromise) {
+    if (config.SERVICE_NAME !== serviceName || config.ENVIRONMENT_NAME !== environmentName) {
+      return Promise.reject(new Error(config.ERRORS.INCONSISTENT_ARGS));
+    }
+    return initPromise;
+  }
+
   if (!serviceName || !environmentName) {
     debug(config.DEBUG, `init: ERROR: ${config.ERRORS.MISSING_NAME_AND_ENV_ARGS}`);
     return Promise.reject(new Error(config.ERRORS.MISSING_NAME_AND_ENV_ARGS));
@@ -46,7 +56,7 @@ function init(serviceName, environmentName) {
   config.SERVICE_NAME = serviceName;
   config.ENVIRONMENT_NAME = environmentName;
 
-  return new Promise((resolve, reject) => {
+  initPromise = new Promise((resolve, reject) => {
     getId(serviceName)
     .then((id) => {
       debug(config.DEBUG, `init: completed with INSTANCE_ID: ${id}`);
@@ -57,6 +67,8 @@ function init(serviceName, environmentName) {
       reject(err);
     });
   });
+
+  return initPromise;
 }
 
 function isReady() {
