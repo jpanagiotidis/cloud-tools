@@ -6,6 +6,7 @@ const dateUtils = require('./source/date-utils');
 const aws = require('./source/aws');
 const utils = require('./source/utils');
 const messageUtils = require('./source/message-utils');
+const eventBus = require('./source/event-bus');
 
 module.exports = {
   getId,
@@ -14,4 +15,5 @@ module.exports = {
   aws,
   utils,
   messageUtils,
+  eventBus,
 };
