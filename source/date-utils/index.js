@@ -24,7 +24,12 @@ function getTimestamp(value) {
   return (new DateObj(value)).getTimestamp();
 }
 
+function getUTCString() {
+  return (new DateObj(value)).getUTCString();
+}
+
 module.exports = {
   DateObj,
   getTimestamp,
+  getUTCString,
 };
