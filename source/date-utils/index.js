@@ -16,7 +16,7 @@ class DateObj {
   }
 
   getUTCString() {
-    return this.getFormatted();
+    return this.getFormatted('YYYY-MM-DDTHH:mm:ss.SSSZ');
   }
 }
 
