@@ -24,7 +24,7 @@ function getTimestamp(value) {
   return (new DateObj(value)).getTimestamp();
 }
 
-function getUTCString() {
+function getUTCString(value) {
   return (new DateObj(value)).getUTCString();
 }
 
