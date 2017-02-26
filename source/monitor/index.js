@@ -12,7 +12,7 @@ let cwLog;
 let initPromise;
 
 function exceptionCb(err) {
-  debug(debugName, `exceptionCb: uncaughtException ${err.message}`);
+  debug(debugName, 'exceptionCb: uncaughtException', err.message, err.stack);
   debug(debugName, 'exceptionCb: sending log to cw');
   cwLog.putLogs([{
     timestamp: getTimestamp(),
@@ -33,7 +33,7 @@ function exceptionCb(err) {
 }
 
 function rejectionCb(err) {
-  debug(debugName, `rejectionCb: unhandledRejection ${err.message}`);
+  debug(debugName, 'rejectionCb: unhandledRejection', err.message, err.stack);
   debug(debugName, 'rejectionCb: sending log to cw');
   cwLog.putLogs([{
     timestamp: getTimestamp(),
