@@ -41,4 +41,5 @@ module.exports = {
   DateObj,
   getTimestamp,
   getUTCString,
+  getISOString,
 };
