@@ -18,6 +18,10 @@ class DateObj {
   getUTCString() {
     return this.getFormatted('YYYY-MM-DDTHH:mm:ss.SSS');
   }
+
+  getISOString() {
+    return this.getFormatted();
+  }
 }
 
 function getTimestamp(value) {
@@ -26,6 +30,11 @@ function getTimestamp(value) {
 
 function getUTCString(value) {
   return (new DateObj(value)).getUTCString();
+}
+
+
+function getISOString(value) {
+  return (new DateObj(value)).getISOString();
 }
 
 module.exports = {
