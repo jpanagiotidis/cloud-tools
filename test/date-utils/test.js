@@ -7,6 +7,7 @@ const DateObj = dateUtils.DateObj;
 const getTimestamp = dateUtils.getTimestamp;
 
 const utcString = '2016-06-16T16:33:56Z';
+const utcStringMilli = '2016-06-16T16:33:56.000';
 const indiaString = '2016-06-16T22:03:56+05:30';
 const utcTS = (new Date(utcString)).getTime();
 const indiaTS = (new Date(indiaString)).getTime();
@@ -36,13 +37,13 @@ describe('Test date-utils', function(){
     it('if no argument is passed in the constructor, the current time must be assigned', sinon.test(function(){
       this.clock = sinon.useFakeTimers(indiaTS);
       const t = new DateObj();
-      expect(t.getUTCString()).to.be.equal(utcString);
+      expect(t.getUTCString()).to.be.equal(utcStringMilli);
       this.clock.restore();
     }));
 
     it('if a unix timestamp is passed in the constructor, a time object based on this timestamp must be created', function(){
       const t = new DateObj(indiaTS);
-      expect(t.getUTCString()).to.be.equal(utcString);
+      expect(t.getUTCString()).to.be.equal(utcStringMilli);
     });
 
     it('utc string must be the same across different timezones', function(){
@@ -51,11 +52,11 @@ describe('Test date-utils', function(){
       expect(t1.getUTCString()).to.be.equal(t2.getUTCString());
     });
 
-    it('utc string must end with the Z character', function(){
-      const t = new DateObj(indiaTS);
-      const utc = t.getUTCString();
-      expect(utc[utc.length - 1]).to.be.equal('Z');
-    });
+    // it('utc string must end with the Z character', function(){
+    //   const t = new DateObj(indiaTS);
+    //   const utc = t.getUTCString();
+    //   expect(utc[utc.length - 1]).to.be.equal('Z');
+    // });
 
     it('getFormatted must return a string using the passed format', function(){
       const t = new DateObj(indiaTS);

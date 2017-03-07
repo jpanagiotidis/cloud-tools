@@ -27,7 +27,11 @@ function exceptionCb(err) {
     ),
   }])
   .then(() => {
-    debug(debugName, 'exceptionCb: stoping the application');
+    debug(debugName, 'exceptionCb: stoping the application', err.message);
+    process.exit(1);
+  })
+  .catch((e) => {
+    debug(debugName, 'ERROR exceptionCb:', e.message, 'stoping the application', err.message);
     process.exit(1);
   });
 }
@@ -48,7 +52,11 @@ function rejectionCb(err) {
     ),
   }])
   .then(() => {
-    debug(debugName, 'rejectionCb: stoping the application');
+    debug(debugName, 'rejectionCb: stoping the application', err.message);
+    process.exit(1);
+  })
+  .catch((e) => {
+    debug(debugName, 'ERROR exceptionCb:', e.message, 'stoping the application', err.message);
     process.exit(1);
   });
 }
@@ -73,7 +81,7 @@ function init(serviceName, environmentName) {
       })
     ))
     .catch((err) => {
-      console.log('ERROR', err);
+      console.log('ERROR', err); // eslint-disable-line no-console
     });
   }
 

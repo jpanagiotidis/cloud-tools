@@ -1,21 +1,23 @@
 'use strict';
 
-const config = require('../config.js').services.CloudWatchLogs;
+const config = require('../config.js');
 const debug = require('../../debug');
 const aws = require('aws-sdk');
 const prepareLogsBatches = require('./utils.js').prepareLogsBatches;
 const chain = require('../../async').chain;
 
+const configCW = config.services.CloudWatchLogs;
+const FAKE = config.other.FAKE;
 const debugName = 'CWLogs';
 
 class CWLogs {
   constructor(groupName, streamName, data) {
     this.cw = new aws.CloudWatchLogs(Object.assign(
       {},
-      config,
+      configCW,
       data,
       {
-        apiVersion: config.apiVersion,
+        apiVersion: configCW.apiVersion,
       }
     ));
 
@@ -24,6 +26,11 @@ class CWLogs {
   }
 
   init() {
+    if (FAKE) {
+      debug(debugName, 'fake init', this.groupName);
+      return Promise.resolve();
+    }
+
     return this.checkGroupExists(this.groupName)
     .then((res) => {
       if (res === false) {
@@ -99,6 +106,11 @@ class CWLogs {
   }
 
   putLogs(data) {
+    if (FAKE) {
+      debug(debugName, 'putLogs fake', data);
+      return Promise.resolve();
+    }
+
     if (data.length === 0) {
       debug(debugName, 'putLogs: No data to send!', data);
       return Promise.resolve();
@@ -116,6 +128,11 @@ class CWLogs {
   }
 
   putBatch(data) {
+    if (FAKE) {
+      debug(debugName, 'putBatch fake', data);
+      return Promise.resolve();
+    }
+
     if (data.length === 0) {
       debug(debugName, 'putBatch: No data to send!', data);
       return Promise.resolve();
