@@ -112,7 +112,7 @@ class CWLogs {
     }
 
     if (data.length === 0) {
-      debug(debugName, 'putLogs: No data to send!', data);
+      // debug(debugName, 'putLogs: No data to send!', data);
       return Promise.resolve();
     }
     const batches = prepareLogsBatches(data);
