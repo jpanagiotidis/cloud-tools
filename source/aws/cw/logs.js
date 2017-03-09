@@ -137,7 +137,7 @@ class CWLogs {
       debug(debugName, 'putBatch: No data to send!', data);
       return Promise.resolve();
     }
-    debug(debugName, 'putBatch: Start sending data', data);
+    debug(debugName, 'putBatch: Start sending data', data.length);
     return this.cw.putLogEvents({
       logEvents: data,
       logGroupName: this.groupName,
