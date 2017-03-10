@@ -148,6 +148,11 @@ class CWLogs {
       debug(debugName, 'putBatch: Sending data completed');
       this.setSequenceToken(res.nextSequenceToken);
       return Promise.resolve();
+    })
+    .catch((err) => {
+      debug(debugName, 'ERROR: putBatch', err.message);
+      this.checkStreamExists()
+      .then(() => (Promise.reject(err)));
     });
   }
 }
