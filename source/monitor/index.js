@@ -1,31 +1,24 @@
 'use strict';
 
 const messageUtils = require('../message-utils');
-const CWLogs = require('../aws').cw.CWLogs;
-const getId = require('../id').getId;
+const SQSProducer = require('../aws').sqs.SQSProducer;
 const debug = require('../debug');
-const getTimestamp = require('../date-utils').getTimestamp;
 
 const debugName = 'Monitor';
 const errorTypes = messageUtils.getCommonErrorTypes();
-let cwLog;
 let initPromise;
+let sqs;
 
 function exceptionCb(err) {
   debug(debugName, 'exceptionCb: uncaughtException', err.message, err.stack);
   debug(debugName, 'exceptionCb: sending log to cw');
-  cwLog.putLogs([{
-    timestamp: getTimestamp(),
-    message: JSON.stringify(
-      messageUtils.getError(
-        errorTypes.UNCAUGHT_EXCEPTION,
-        {
-          message: err.message,
-          trace: err,
-        }
-      )
-    ),
-  }])
+  sqs.publish(messageUtils.getError(
+    errorTypes.UNCAUGHT_EXCEPTION,
+    {
+      message: err.message,
+      trace: err,
+    }
+  ))
   .then(() => {
     debug(debugName, 'exceptionCb: stoping the application', err.message);
     process.exit(1);
@@ -39,18 +32,13 @@ function exceptionCb(err) {
 function rejectionCb(err) {
   debug(debugName, 'rejectionCb: unhandledRejection', err.message, err.stack);
   debug(debugName, 'rejectionCb: sending log to cw');
-  cwLog.putLogs([{
-    timestamp: getTimestamp(),
-    message: JSON.stringify(
-      messageUtils.getError(
-        errorTypes.UNHANDLED_REJECTION,
-        {
-          message: err.message,
-          trace: err,
-        }
-      )
-    ),
-  }])
+  sqs.publish(messageUtils.getError(
+    errorTypes.UNHANDLED_REJECTION,
+    {
+      message: err.message,
+      trace: err,
+    }
+  ))
   .then(() => {
     debug(debugName, 'rejectionCb: stoping the application', err.message);
     process.exit(1);
@@ -61,25 +49,15 @@ function rejectionCb(err) {
   });
 }
 
-function init(serviceName, environmentName) {
+function init(serviceName, environmentName, queueURL) {
   if (!initPromise) {
     initPromise = messageUtils.init(serviceName, environmentName)
-    .then(() => (getId(serviceName)))
-    .then((id) => {
-      cwLog = new CWLogs(environmentName, id);
-      return cwLog.init();
+    .then(() => {
+      sqs = new SQSProducer(queueURL);
+      process.on('uncaughtException', exceptionCb);
+      process.on('unhandledRejection', rejectionCb);
+      return Promise.resolve('Monitoring of unhandled errors/rejections is ready');
     })
-    .then(() => (
-      new Promise((resolve, reject) => {
-        try {
-          process.on('uncaughtException', exceptionCb);
-          process.on('unhandledRejection', rejectionCb);
-        } catch (e) {
-          reject(e);
-        }
-        resolve('Monitoring of unhandled errors/rejections is ready');
-      })
-    ))
     .catch((err) => {
       console.log('ERROR', err); // eslint-disable-line no-console
     });

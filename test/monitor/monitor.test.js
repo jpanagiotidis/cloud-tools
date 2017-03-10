@@ -6,13 +6,13 @@ const path = require('path');
 const clearRequireCache = require('../testing-utils.js').clearRequireCache;
 
 const sourcePath = path.join(__dirname, '../../source/');
-const idPath = path.join(sourcePath, 'id');
-const cwPath = path.join(sourcePath, 'aws/cw/logs.js');
+const sqsPath = path.join(sourcePath, 'aws/sqs/producer.js');
 const messagePath = path.join(sourcePath, 'message-utils');
 const monitorPath = path.join(sourcePath, 'monitor');
 
 const dummyName = 'dummy_name';
 const dummyEnv = 'dummy_env';
+const dummyQueue = 'dummy_queue';
 const dummyId = '123';
 const dummyError = new Error('Dummy Error');
 
@@ -43,26 +43,20 @@ describe('Monitor test suite', function(){
   });
 
   it('init function does all the appropriate calls', sinon.test(function(done) {
-    const cw = require(cwPath);
-    const cwFake = function() {};
-    cwFake.prototype.init = () => Promise.resolve();
-    const cwStub = this.stub(cw, 'CWLogs', cwFake);
-
-    const cwInitSpy = this.spy(cwStub.prototype, 'init');
-
-    const id = require(idPath);
-    const idStub = this.stub(id, 'getId', () => Promise.resolve(dummyId));
+    const sqs = require(sqsPath);
+    const sqsFake = function() {};
+    sqsFake.prototype.init = () => Promise.resolve();
+    const sqsStub = this.stub(sqs, 'SQSProducer', sqsFake);
 
     const msg = require(messagePath);
     const msgStub = this.stub(msg, 'init', () => Promise.resolve());
 
     const monitor = require(monitorPath);
-    monitor.init(dummyName, dummyEnv)
+    monitor.init(dummyName, dummyEnv, dummyQueue)
     .then(() => {
-      expect(idStub).to.have.property('calledOnce', true);
       expect(msgStub).to.have.property('calledOnce', true);
-      expect(cwStub).to.have.property('calledOnce', true);
-      expect(cwInitSpy).to.have.property('calledOnce', true);
+      expect(sqsStub).to.have.property('calledOnce', true);
+      expect(sqsStub.args[0][0]).to.be.equal(dummyQueue);
       process.removeListener('uncaughtException', monitor.exceptionCb);
       process.removeListener('unhandledRejection', monitor.rejectionCb);
       done();
@@ -77,17 +71,11 @@ describe('Monitor test suite', function(){
     const exitCache = process.exit;
     process.exit = sinon.spy();
 
-    const cw = require(cwPath);
-    const cwFake = function() {};
-    cwFake.prototype.init = () => Promise.resolve();
-    cwFake.prototype.putLogs = () => Promise.resolve();
-    const cwStub = this.stub(cw, 'CWLogs', cwFake);
-    const cwPutLogsSpy = this.spy(cwStub.prototype, 'putLogs');
-
-    const cwInitSpy = this.spy(cwStub.prototype, 'init');
-
-    const id = require(idPath);
-    const idStub = this.stub(id, 'getId', () => Promise.resolve(dummyId));
+    const sqs = require(sqsPath);
+    const sqsFake = function() {};
+    sqsFake.prototype.publish = () => Promise.resolve();
+    const sqsStub = this.stub(sqs, 'SQSProducer', sqsFake);
+    const sqsPublishSpy = this.spy(sqsStub.prototype, 'publish');
 
     const msg = require(messagePath);
     const msgStub = this.stub(msg, 'init', () => Promise.resolve());
@@ -98,7 +86,7 @@ describe('Monitor test suite', function(){
     .then(() => {
       process.emit('uncaughtException', dummyError);
       setTimeout(() => {
-        expect(cwPutLogsSpy).to.have.property('calledOnce', true);
+        expect(sqsPublishSpy).to.have.property('calledOnce', true);
         expect(process.exit).to.have.property('calledOnce', true);
         process.exit = exitCache;
         process.removeListener('uncaughtException', monitor.exceptionCb);
@@ -114,17 +102,12 @@ describe('Monitor test suite', function(){
     const exitCache = process.exit;
     process.exit = sinon.spy();
 
-    const cw = require(cwPath);
-    const cwFake = function() {};
-    cwFake.prototype.init = () => Promise.resolve();
-    cwFake.prototype.putLogs = () => Promise.resolve();
-    const cwStub = this.stub(cw, 'CWLogs', cwFake);
-    const cwPutLogsSpy = this.spy(cwStub.prototype, 'putLogs');
-
-    const cwInitSpy = this.spy(cwStub.prototype, 'init');
-
-    const id = require(idPath);
-    const idStub = this.stub(id, 'getId', () => Promise.resolve(dummyId));
+    const sqs = require(sqsPath);
+    const sqsFake = function() {};
+    sqsFake.prototype.init = () => Promise.resolve();
+    sqsFake.prototype.publish = () => Promise.resolve();
+    const sqsStub = this.stub(sqs, 'SQSProducer', sqsFake);
+    const sqsPublishSpy = this.spy(sqsStub.prototype, 'publish');
 
     const msg = require(messagePath);
     const msgStub = this.stub(msg, 'init', () => Promise.resolve());
@@ -135,7 +118,7 @@ describe('Monitor test suite', function(){
     .then(() => {
       process.emit('unhandledRejection', dummyError);
       setTimeout(() => {
-        expect(cwPutLogsSpy).to.have.property('calledOnce', true);
+        expect(sqsPublishSpy).to.have.property('calledOnce', true);
         expect(process.exit).to.have.property('calledOnce', true);
         process.exit = exitCache;
         process.removeListener('uncaughtException', monitor.exceptionCb);
